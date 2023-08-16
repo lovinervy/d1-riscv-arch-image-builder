@@ -1,0 +1,28 @@
+name: Builder
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build and push Docker images
+      run: 
+        docker build . --file Dockerfile --tag riscv-arch-image:${{ github.event.commits[0].id }} 
+    - name: build img
+      run: sh build_img.sh ${{ github.event.commits[0].id }}
+
+    - name: Upload archive
+      uses: actions/upload-artifact@v3
+      with:
+        name: archlinux_riscv.img.tar.gz
+        path: /home/runner/work/d1-riscv-arch-image-builder/d1-riscv-arch-image-builder/archlinux_riscv.img.tar.gz
